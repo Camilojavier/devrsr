@@ -68,15 +68,6 @@ pipeline {
         
             }
         }
-        stage("Image push artifactory") {
-            agent any
-            steps{
-                script{
-                    unstash 'backartifact'
-                    sh "sshpass -p password scp /data/jenkins_home/workspace/APP-DEV/build_app-back/target/app.jar userver@192.168.138.3:/home/userver/"
-                }
-            }
-        }
 
     }
 }

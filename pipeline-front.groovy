@@ -1,8 +1,7 @@
 pipeline {
-    agent any
-    //{
-    //  label 'jenkins_slave'
-    //}
+    agent {
+        label 'jenkins_slave'
+    }
     tools {
         nodejs 'node20'
     }
@@ -28,11 +27,19 @@ pipeline {
                 echo "Iniciando build"
                 sh "npm install"
                 sh "npm run build"
+                sh "tar -czf project_files.tar.gz node_modules *.json"
+                stash includes: 'project_files.tar.gz', name: 'frontartifact'
+                archiveArtifacts artifacts: 'project_files.tar.gz', onlyIfSuccessful:true
+                sh "cp project_files.tar.gz /tmp/"
             }
         }
         stage("Test de vulnerabilidades") {
             steps {
                 echo "escaneando vulnerabilidades"
+                sh "ls"
+                sh "/grype /tmp/project_files.tar.gz > informe-scan.txt"
+                sh "pwd"
+                archiveArtifacts artifacts: 'informe-scan.txt', onlyIfSuccessful:true
             }
         }
     }
